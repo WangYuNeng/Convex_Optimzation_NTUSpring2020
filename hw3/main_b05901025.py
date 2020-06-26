@@ -84,11 +84,13 @@ def my_hw3(x, C, d, A, b, t):
     print("d = ", d)
     l = 0 # iter_cnt
     ls = [0]
+    xs = []
     f0s, fs, ds, ss, gs = [], [], [], [], [] # f0(x), f(x), newton_decr, backtrack_s, dual_gap
     while True:
         func = Function(A, b, C, d, t)
         optimizer = Optimizer(func)
         converged = False
+        xs.append(x)
         while not converged:
             f0s.append(func.at_obj(x)[0])
             fs.append(func.at(x)[0])
@@ -106,17 +108,28 @@ def my_hw3(x, C, d, A, b, t):
             break
         t *= MIU
     print("Total number of Newton steps = {}".format(l))
-    print("Optimal value = {}".format(func.at_obj(x)))
+    print("Optimal value = {}".format(func.at_obj(x)[0]))
     print("Optimal x =", x)
-    
+    '''
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.plot(xs[0][0], xs[0][1], marker='o', c='purple', label='starting point')
+    plt.plot([x[0] for x in xs[1:]], [x[1] for x in xs[1:]], marker='o', c='b', label='central path')
+    x2 = np.arange(-0.01, 0.06, 0.001)
+    for i, (c, dd) in enumerate(zip(C, d)):
+        plt.plot((-c[1]*x2+dd)/c[0], x2, label='constraint{}'.format(i+1))
+    plt.legend()
+    plt.show()
+    plt.clf()
+
     x_axis = [i for i in range(len(fs))]
 
     plt.xlabel('iter')
     plt.yscale('log')
-    plt.plot(x_axis, gs, marker='o', label='duality gap')
+    plt.plot(x_axis, gs, marker='o', label='duality gap (MIU={})'.format(MIU))
     plt.legend(loc=1)
-    plt.savefig("figures/{}_{}_n.png".format(SETTING, MIU))
-    plt.clf()
+    # plt.savefig("figures/{}_{}_n.png".format(SETTING, MIU))
+    # plt.clf()
 
     plt.xlabel('iter')
     plt.yscale('log')
@@ -140,6 +153,7 @@ def my_hw3(x, C, d, A, b, t):
     plt.legend(loc=1)
     plt.savefig("figures/{}_{}_r.png".format(SETTING, MIU))
     plt.clf()
+    '''
 
     return x
     
@@ -159,8 +173,17 @@ if __name__ == "__main__":
     b = np.array([[0.1], [0.1], [0.1]])
     C = np.array([[-1, 0], [-1, -1]])
     d = np.array([[0.3], [0.2]])
-    t = 1
-    my_hw3(np.array([[0], [0]]).reshape(-1,), C, d, A, b, t)
-    print(cvx_hw3(A, b, C, d, np.array([[0], [0]])))
+    SETTING=1
+    my_hw3(np.array([[0], [0]]).reshape(-1,), C, d, A, b, 1)
+    # print(cvx_hw3(A, b, C, d, np.array([[0], [0]])))
     
+    print("")
+    SETTING=2
+    d = np.array([[0.3], [0.3]])
+    my_hw3(np.array([[0], [0]]).reshape(-1,), C, d, A, b, 1)
+
+    print("")
+    SETTING=3
+    d = np.array([[0.4], [0.4]])
+    my_hw3(np.array([[0], [0]]).reshape(-1,), C, d, A, b, 1)
 
